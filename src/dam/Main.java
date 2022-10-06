@@ -23,30 +23,25 @@ import java.util.List;
 public class Main {
 
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
-    Path fichero = Paths.get("direcciones.txt");
-    List<String> lineas;
-       lineas= Files.readAllLines(fichero);
-        long tiempoInicial;
-        long tiempoTotal=0;
-        long tiempoFinal;
+        List<String> direcciones = Files.readAllLines(new File("direcciones.txt").toPath());
         int contador = 0;
-
-        for (String linea :
-                lineas) {
-            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "ping", linea);
-            String nombreFicheroDestino = "ping-"+contador++ +".txt";
-            pb.redirectOutput(ProcessBuilder.Redirect.to(new File(nombreFicheroDestino)));
+        long tiempoInicial;
+        long tiempoFinal;
+        long tiempoTotal=0;
+        for (String direccion :
+                direcciones) {
+            ProcessBuilder pb = new ProcessBuilder("ping", direccion);
+            pb.redirectOutput(new File("ping-" + contador++ + ".txt"));
             tiempoInicial=System.currentTimeMillis();
-            pb.start();
+            Process proceso = pb.start();
+            proceso.waitFor();
             tiempoFinal=System.currentTimeMillis();
-            tiempoTotal+= tiempoFinal-tiempoInicial;
-
+            tiempoTotal+=(tiempoFinal-tiempoInicial);
         }
-        long tiempoPromedio= tiempoTotal/lineas.size();
-        System.out.println("El tiempo promedio que han tardado los procesos es de:"+tiempoPromedio);
-
+        long tiempoMedio=tiempoTotal/direcciones.size();
+        System.out.println("El tiempo promedio ha sido: "+tiempoMedio);
 
     }
 }
